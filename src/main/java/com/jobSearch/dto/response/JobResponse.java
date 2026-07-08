@@ -19,5 +19,6 @@ public class JobResponse {
     private int vacancies;
     private JobStatus status ;
     private LocalDateTime createdAt ;
+    private LocalDateTime updatedAt ;
 
 }

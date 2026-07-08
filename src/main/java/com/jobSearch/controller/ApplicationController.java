@@ -1,28 +1,46 @@
 package com.jobSearch.controller;
 
+import com.jobSearch.dto.request.UpdateApplicationStatusRequest;
+import com.jobSearch.dto.response.ApplicationResponse;
 import com.jobSearch.service.ApplicationsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/applications")
 public class ApplicationController {
-   @Autowired
-    private ApplicationsService applicationsService;
 
+    private final ApplicationsService applicationsService;
 
+   public ApplicationController(ApplicationsService applicationsService) {
+       this.applicationsService = applicationsService;
+   }
 
    @GetMapping("/my")
-    private ResponseEntity<?> getAllApplications(){
-
+   public ResponseEntity<?> getAllApplications(){
+return ResponseEntity.ok(applicationsService.getMyApplications());
    }
    @PutMapping("/{applicationId}/status")
-    private ResponseEntity<?> updateApplication(@PathVariable String applicationId){
-
+   public ResponseEntity<?> updateApplication(@PathVariable String applicationId ,@Valid @RequestBody UpdateApplicationStatusRequest update){
+      return ResponseEntity.ok(applicationsService.updateApplicationStatus(applicationId,update));
    }
    @PutMapping("/{applicationId}/withdraw")
-    private ResponseEntity<?> withdrawApplication(@PathVariable String applicationId){
-
+   public ResponseEntity<?> withdrawApplication(@PathVariable String applicationId){
+return ResponseEntity.ok(applicationsService.withdrawApplication(applicationId));
    }
+
+   @GetMapping("/job/{jobId}")
+   public ResponseEntity<List<ApplicationResponse>>
+   getApplicationsForJob(@PathVariable String jobId) {
+
+      return ResponseEntity.ok(
+              applicationsService.getApplicationsForJob(jobId)
+      );
+   }
+
+
 }

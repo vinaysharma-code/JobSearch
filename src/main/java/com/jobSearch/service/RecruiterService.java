@@ -13,7 +13,7 @@ import com.jobSearch.repository.UserRepo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDateTime;
 
@@ -27,7 +27,7 @@ public class RecruiterService {
         this.recruiterRepo = recruiterRepo;
         this.userRepo = userRepo;
     }
-   @Transactional
+
     public RecruiterResponse createRecruiter(RecruiterRequest recruiterRequest) {
 
 
@@ -36,9 +36,7 @@ public class RecruiterService {
         if(recruiterRepo.existsByUserId(user.getId())){
             throw new DuplicateResourceException("Recruiter profile already exists");
         }
-       if (user.getRole() == Role.RECRUITER) {
-           throw new DuplicateResourceException("User is already a recruiter.");
-       }
+
         Recruiter recruiter = new Recruiter();
         recruiter.setCompanyDescription(recruiterRequest.getCompanyDescription());
         recruiter.setPhone(recruiterRequest.getPhone());
@@ -50,11 +48,16 @@ public class RecruiterService {
         recruiter.setCreatedAt(now);
         recruiter.setUpdatedAt(now);
         recruiter.setFullName(recruiterRequest.getFullName());
-       Recruiter savedRecruiter = recruiterRepo.save(recruiter);
-        user.setRole(Role.RECRUITER);
-        user.setUpdatedAt(LocalDateTime.now());
 
+        // NOTE: @Transactional removed — MongoDB transactions require replica set.
+// Writes ordered by criticality: user role updated first (auth source of truth),
+// recruiter profile created second (recoverable if this fails).
+
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setRole(Role.RECRUITER);
         userRepo.save(user);
+        Recruiter savedRecruiter = recruiterRepo.save(recruiter);
+
         // create response
      return mapToResponse(savedRecruiter,user.getEmail());
     }

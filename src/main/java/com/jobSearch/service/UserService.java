@@ -14,7 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ public class UserService {
         this.authenticationManager=authenticationManager;
         this.passwordEncoder=passwordEncoder;
     }
-    @Transactional
+
     public RegisterResponse register(RegisterRequest request) {
         if(userRepo.existsByEmail(request.getEmail())){
             throw new DuplicateResourceException("email already exists");
@@ -43,7 +43,7 @@ public class UserService {
         User user = new User();
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
-        user.setRole(request.getRole());
+        user.setRole(Role.APPLICANT);
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());

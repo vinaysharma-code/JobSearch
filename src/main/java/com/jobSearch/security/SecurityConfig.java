@@ -30,12 +30,14 @@ public class SecurityConfig  {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/jobs").hasRole("RECRUITER")
-                .requestMatchers(HttpMethod.GET, "/jobs").permitAll()
+                .requestMatchers(HttpMethod.GET, "/jobs/**").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/jobs/**").hasRole("RECRUITER")
                 .requestMatchers(HttpMethod.DELETE, "/jobs/**").hasRole("RECRUITER")
                 .requestMatchers(HttpMethod.POST, "/jobs/*/apply").hasRole("APPLICANT")
                 .requestMatchers("/applications/**").hasRole("APPLICANT")
-                .requestMatchers("/recruiter/**").hasRole("RECRUITER")
+                .requestMatchers(HttpMethod.POST, "/recruiter/profile").hasRole("APPLICANT")
+                .requestMatchers(HttpMethod.GET, "/recruiter/profile").hasRole("RECRUITER")
+                .requestMatchers(HttpMethod.PATCH, "/recruiter/profile").hasRole("RECRUITER")
                 .requestMatchers("/applicant/**").hasRole("APPLICANT")
                 .anyRequest().authenticated()
         );
